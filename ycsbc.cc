@@ -25,7 +25,7 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 
 int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading) {
-  db->Init();
+  //db->Init();
   ycsbc::Client client(*db, *wl);
   int oks = 0;
   for (int i = 0; i < num_ops; ++i) {
@@ -34,8 +34,12 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     } else {
       oks += client.DoTransaction();
     }
+      if (oks % 1000000 == 0) {
+          std::cerr << "finished: " << oks << std::endl;
+          std::cerr.flush();
+      }
   }
-  db->Close();
+  //db->Close();
   return oks;
 }
 
@@ -44,6 +48,7 @@ int main(const int argc, const char *argv[]) {
   string file_name = ParseCommandLine(argc, argv, props);
 
   ycsbc::DB *db = ycsbc::DBFactory::CreateDB(props);
+  db->Init();
   if (!db) {
     cout << "Unknown database name " << props["dbname"] << endl;
     exit(0);
@@ -55,6 +60,8 @@ int main(const int argc, const char *argv[]) {
   const int num_threads = stoi(props.GetProperty("threadcount", "1"));
 
   // Loads data
+  utils::Timer<double> timer1;
+  timer1.Start();
   vector<future<int>> actual_ops;
   int total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
   for (int i = 0; i < num_threads; ++i) {
@@ -68,9 +75,14 @@ int main(const int argc, const char *argv[]) {
     assert(n.valid());
     sum += n.get();
   }
-  cerr << "# Loading records:\t" << sum << endl;
+  double duration1 = timer1.End();
+  cout << "# Loading records:\t" << sum << " takes " << duration1 << " s"<< endl;
+  cout << "# Load throughput (KTPS)" << endl;
+  cout << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
+  cout << total_ops / duration1 / 1000 << endl;
 
   // Peforms transactions
+
   actual_ops.clear();
   total_ops = stoi(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
   utils::Timer<double> timer;
@@ -87,9 +99,11 @@ int main(const int argc, const char *argv[]) {
     sum += n.get();
   }
   double duration = timer.End();
-  cerr << "# Transaction throughput (KTPS)" << endl;
-  cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
-  cerr << total_ops / duration / 1000 << endl;
+  cout << "# Transaction throughput (KTPS)" << endl;
+  cout << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
+  cout << total_ops / duration / 1000 << endl;
+
+  db->Close();
 }
 
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) {
@@ -151,6 +165,14 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) 
         exit(0);
       }
       input.close();
+      argindex++;
+    } else if (strcmp(argv[argindex], "-file_ratio") == 0) {
+      argindex++;
+      if (argindex >= argc) {
+          UsageMessage(argv[0]);
+          exit(0);
+      }
+      props.SetProperty("file_ratio", argv[argindex]);
       argindex++;
     } else {
       cout << "Unknown option '" << argv[argindex] << "'" << endl;
