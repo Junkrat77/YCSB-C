@@ -40,3 +40,4 @@
 
 redis/sample
 ycsbc
+build/*

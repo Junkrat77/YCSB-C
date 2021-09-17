@@ -26,5 +26,3 @@ add_library( pmem_rocksdb_db.cc )
 include_directories(../lib/pmem-rocksdb/include
 	../
 )
-
-add_s

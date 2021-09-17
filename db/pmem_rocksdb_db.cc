@@ -3,12 +3,12 @@
 //
 
 #include "pmem_rocksdb_db.h"
-#include "lib/pmem-rocksdb/include/rocksdb/status.h"
-#include "lib/pmem-rocksdb/include/rocksdb/options.h"
-#include "lib/pmem-rocksdb/include/rocksdb/env.h"
-#include "lib/pmem-rocksdb/include/rocksdb/slice.h"
-#include "lib/pmem-rocksdb/include/rocksdb/write_batch.h"
-#include "lib/pmem-rocksdb/include/rocksdb/iterator.h"
+#include "rocksdb/status.h"
+#include "rocksdb/options.h"
+#include "rocksdb/env.h"
+#include "rocksdb/slice.h"
+#include "rocksdb/write_batch.h"
+#include "rocksdb/iterator.h"
 
 using namespace ycsbc;
 
