@@ -16,6 +16,7 @@
 #include "core/client.h"
 #include "core/core_workload.h"
 #include "db/db_factory.h"
+#include "db/roart_db.h"
 
 using namespace std;
 
@@ -25,8 +26,11 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 
 int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading) {
-  //db->Init();
+  // db->Init();
   ycsbc::Client client(*db, *wl);
+#ifdef USING_ROART
+  ycsbc_roart::register_threadinfo();
+#endif
   int oks = 0;
   for (int i = 0; i < num_ops; ++i) {
     if (is_loading) {
@@ -39,7 +43,7 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
           std::cerr.flush();
       }
   }
-  //db->Close();
+  // db->Close();
   return oks;
 }
 
@@ -73,7 +77,7 @@ int main(const int argc, const char *argv[]) {
   int sum = 0;
   for (auto &n : actual_ops) {
     assert(n.valid());
-    sum += n.get();
+    sum += n.get(); // 等价于先调用wait在调用get
   }
   double duration1 = timer1.End();
   cout << "# Loading records:\t" << sum << " takes " << duration1 << " s"<< endl;

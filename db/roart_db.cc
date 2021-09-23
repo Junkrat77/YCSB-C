@@ -1,17 +1,14 @@
 #include "roart_db.h"
+#include "lib/ROART/nvm_mgr/threadinfo.h"
 
 using namespace ycsbc;
 
 namespace ycsbc_roart {
-	
-	const std::string PMEM_PATH("/mnt/AEP0/ROART");
-
-	
 	// const std::string PMEM_PATH("/mnt/pmem/");
     // const std::string DB_NAME("/mnt/pmem/rocksdb/");
     // const uint64_t PMEM_SIZE = 60 * 1024UL * 1024UL * 1024UL;
 	void RoartDB::Init() {
-
+		printf("test\n");
 		art = new PART_ns::Tree();
 		// TODO: need init?
 	}
@@ -98,5 +95,9 @@ namespace ycsbc_roart {
         PART_ns::Leaf *scan_result[505];
 		art->lookupRange(&k, &maxkey, continueKey, scan_result, record_count, resultFound);		 	 
 		return DB::kOK;
+	}
+
+    void register_threadinfo() {
+		NVMMgr_ns::register_threadinfo();
 	}
 }

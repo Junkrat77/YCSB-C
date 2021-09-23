@@ -38,6 +38,8 @@ class RoartDB : public ycsbc::DB {
     private:
         PART_ns::Tree* art;
     };
+    
+    void register_threadinfo();
 }
 
 #endif //YCSB_ROART_DB_H
