@@ -27,12 +27,10 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading) {
   // db->Init();
-  printf("In Client!\n");
   ycsbc::Client client(*db, *wl);
 #ifdef USING_ROART
   ycsbc_roart::register_threadinfo();
-#endif 
-  
+#endif
   int oks = 0;
   for (int i = 0; i < num_ops; ++i) {
     if (is_loading) {
@@ -79,7 +77,7 @@ int main(const int argc, const char *argv[]) {
   int sum = 0;
   for (auto &n : actual_ops) {
     assert(n.valid());
-    sum += n.get();
+    sum += n.get(); // 等价于先调用wait在调用get
   }
   // printf("future run over!\n");
   double duration1 = timer1.End();

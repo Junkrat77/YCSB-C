@@ -4,7 +4,6 @@
 using namespace ycsbc;
 
 namespace ycsbc_roart {
-	
 	void register_threadinfo() {
 		NVMMgr_ns::register_threadinfo();
 	}
@@ -12,7 +11,7 @@ namespace ycsbc_roart {
     // const std::string DB_NAME("/mnt/pmem/rocksdb/");
     // const uint64_t PMEM_SIZE = 60 * 1024UL * 1024UL * 1024UL;
 	void RoartDB::Init() {
-
+		printf("test\n");
 		art = new PART_ns::Tree();
 		// TODO: need init?
 	}
@@ -117,4 +116,12 @@ biggerkey.Init((char*)bigger.c_str(), bigger.size(), (char*)&value, 8);
 		// } 	
 		return DB::kOK;
 	}
+<<<<<<< HEAD
 }
+=======
+
+    void register_threadinfo() {
+		NVMMgr_ns::register_threadinfo();
+	}
+}
+>>>>>>> 20546db465fb90e9376baa7afecec6375a868c34
