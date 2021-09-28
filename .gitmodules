@@ -4,4 +4,4 @@
 	url = git@github.com:Junkrat77/pmem-rocksdb.git
 [submodule "lib/ROART"]
 	path = lib/ROART
-	url = git@github.com:Junkrat77/ROART
+	url = git@github.com:Junkrat77/ROART.git

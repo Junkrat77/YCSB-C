@@ -16,6 +16,7 @@
 #include "core/client.h"
 #include "core/core_workload.h"
 #include "db/db_factory.h"
+#include "db/roart_db.h"
 
 using namespace std;
 
@@ -25,8 +26,13 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 
 int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading) {
-  //db->Init();
+  // db->Init();
+  printf("In Client!\n");
   ycsbc::Client client(*db, *wl);
+#ifdef USING_ROART
+  ycsbc_roart::register_threadinfo();
+#endif 
+  
   int oks = 0;
   for (int i = 0; i < num_ops; ++i) {
     if (is_loading) {
@@ -39,7 +45,7 @@ int DelegateClient(ycsbc::DB *db, ycsbc::CoreWorkload *wl, const int num_ops,
           std::cerr.flush();
       }
   }
-  //db->Close();
+  // db->Close();
   return oks;
 }
 
@@ -56,7 +62,7 @@ int main(const int argc, const char *argv[]) {
 
   ycsbc::CoreWorkload wl;
   wl.Init(props);
-
+  
   const int num_threads = stoi(props.GetProperty("threadcount", "1"));
 
   // Loads data
@@ -69,12 +75,13 @@ int main(const int argc, const char *argv[]) {
         DelegateClient, db, &wl, total_ops / num_threads, true));
   }
   assert((int)actual_ops.size() == num_threads);
-
+  // printf("future push over!\n");
   int sum = 0;
   for (auto &n : actual_ops) {
     assert(n.valid());
     sum += n.get();
   }
+  // printf("future run over!\n");
   double duration1 = timer1.End();
   cout << "# Loading records:\t" << sum << " takes " << duration1 << " s"<< endl;
   cout << "# Load throughput (KTPS)" << endl;
@@ -94,10 +101,15 @@ int main(const int argc, const char *argv[]) {
   assert((int)actual_ops.size() == num_threads);
 
   sum = 0;
+  // printf("future push over!\n");
   for (auto &n : actual_ops) {
+    // printf("before assert\n");
     assert(n.valid());
+    // printf("after assert\n");
+    n.wait();
     sum += n.get();
   }
+  printf("future over!");
   double duration = timer.End();
   cout << "# Transaction throughput (KTPS)" << endl;
   cout << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';

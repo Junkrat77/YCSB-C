@@ -3,8 +3,8 @@ project(ycsb)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g")
 include(FindThreads)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TBB REQUIRED tbb)
@@ -15,7 +15,7 @@ pkg_check_modules(LIBPMEMOBJ REQUIRED libpmemobj)
 
 # only on DB can be set to ON when building ycsb
 #as some function name may conflict
-option(WITH_PMEM_ROCKSDB "support the pmem rocksdb" ON)
+option(WITH_PMEM_ROCKSDB "support the pmem rocksdb" OFF)
 option(WITH_CCEH "support for CCEH hash table" OFF)
 option(WITH_UTREE "support for uTree" OFF)
 option(WITH_VIPER "support for Viper" OFF)
@@ -84,6 +84,7 @@ endif ()
 
 if (WITH_ROART)
 	message("Define roart")
+	add_definitions(-DUSING_ROART)
         add_definitions(-DCLWB)
         add_definitions(-DVARIABLE_LENGTH)
         add_definitions(-DUSE_PMDK)
