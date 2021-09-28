@@ -107,7 +107,7 @@ namespace ycsbc_roart {
 		uint64_t prefix_len = 15;
 		std::string bigger = whole_key.substr(0, prefix_len);
 		bigger[prefix_len-1] = (char)((char)bigger[prefix_len-1]+1);
-biggerkey.Init((char*)bigger.c_str(), bigger.size(), (char*)&value, 8);
+		biggerkey.Init((char*)bigger.c_str(), bigger.size(), (char*)&value, 8);
 		// printf("bigger prefix = %s\n", bigger.c_str());
 		art->lookupRange(&getkey, &biggerkey, continueKey, scan_result, record_count, resultFound);
 		// printf("scan key      = %s, scan_length = %d\n", whole_key.c_str(), record_count);
@@ -116,12 +116,8 @@ biggerkey.Init((char*)bigger.c_str(), bigger.size(), (char*)&value, 8);
 		// } 	
 		return DB::kOK;
 	}
-<<<<<<< HEAD
-}
-=======
 
     void register_threadinfo() {
 		NVMMgr_ns::register_threadinfo();
 	}
 }
->>>>>>> 20546db465fb90e9376baa7afecec6375a868c34
