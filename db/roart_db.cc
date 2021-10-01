@@ -24,7 +24,7 @@ namespace ycsbc_roart {
 		std::string k = table + key;
         std::string v;
         for (const auto& item : values) {
-            k.append(item.first + item.second);
+            v.append(item.first + item.second);
         }
 		
 		bool res = art->Put(k, v);
@@ -43,10 +43,10 @@ namespace ycsbc_roart {
 		// std::string raw_value;
 		const std::string* v;
 		bool ret = art->Get(k, v);
-		if (ret == 0) {
-			return DB::kErrorNoData;
+		if (ret == true) {
+			return DB::kOK;
 		}
-		return DB::kOK;
+		return DB::kErrorNoData;
 	}
 
 
@@ -70,7 +70,7 @@ namespace ycsbc_roart {
 	int RoartDB::Delete(const std::string &table, const std::string &key) {
 		std::string k = table + key;
 		bool res = art->Delete(k);
-		if (1 == res) {
+		if (true == res) {
 			return DB::kOK;
 		} else {
 			// not found
