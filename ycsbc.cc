@@ -73,13 +73,11 @@ int main(const int argc, const char *argv[]) {
         DelegateClient, db, &wl, total_ops / num_threads, true));
   }
   assert((int)actual_ops.size() == num_threads);
-  // printf("future push over!\n");
   int sum = 0;
   for (auto &n : actual_ops) {
     assert(n.valid());
     sum += n.get(); // 等价于先调用wait在调用get
   }
-  // printf("future run over!\n");
   double duration1 = timer1.End();
   cout << "# Loading records:\t" << sum << " takes " << duration1 << " s"<< endl;
   cout << "# Load throughput (KTPS)" << endl;
@@ -99,15 +97,11 @@ int main(const int argc, const char *argv[]) {
   assert((int)actual_ops.size() == num_threads);
 
   sum = 0;
-  // printf("future push over!\n");
   for (auto &n : actual_ops) {
-    // printf("before assert\n");
     assert(n.valid());
-    // printf("after assert\n");
     n.wait();
     sum += n.get();
   }
-  printf("future over!");
   double duration = timer.End();
   cout << "# Transaction throughput (KTPS)" << endl;
   cout << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
