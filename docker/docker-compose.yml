@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  pmem-gq:
+    build: .
+
+    volumes:
+      - /home/ganquan/:/home/
+      - /home/ganquan/pmem:/mnt/pmem
+    ports:
+      - "34567:22"
+    cap_add:
+      - ALL
+    privileged: true
