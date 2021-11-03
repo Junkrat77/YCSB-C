@@ -15,13 +15,13 @@ pkg_check_modules(LIBPMEMOBJ REQUIRED libpmemobj)
 
 # only on DB can be set to ON when building ycsb
 #as some function name may conflict
-option(WITH_PMEM_ROCKSDB "support the pmem rocksdb" OFF)
+option(WITH_PMEM_ROCKSDB "support the pmem rocksdb" ON)
 option(WITH_CCEH "support for CCEH hash table" OFF)
 option(WITH_UTREE "support for uTree" OFF)
 option(WITH_VIPER "support for Viper" OFF)
 option(WITH_HIKV "support for HiKV" OFF)
 option(WITH_METAKV "support for MetaKV" OFF)
-option(WITH_ROART "support for Roart" ON)
+option(WITH_ROART "support for Roart" OFF)
 
 add_executable(ycsb "")
 target_sources(ycsb PUBLIC
@@ -47,12 +47,12 @@ target_sources(ycsb PUBLIC
         "db/hashtable_db.cc"
         "db/hashtable_db.h"
         "db/lock_stl_db.h"
-        # "db/redis_db.cc"
-        # "db/redis_db.h"
+        #  "db/redis_db.cc"
+        #  "db/redis_db.h"
         "db/tbb_rand_db.h"
         "db/tbb_scan_db.h"
-        #"db/log_db.cc"
-        #"db/log_db.h"
+        "db/metadb.cc"
+        "db/metadb.h"
 
         "lib/lock_stl_hashtable.h"
         "lib/mem_alloc.h"
@@ -187,6 +187,5 @@ if (WITH_METAKV)
 endif ()
 
 target_include_directories(ycsb PUBLIC .)
-message("sdfdsfds\n")
 # target_link_libraries(ycsb ${CMAKE_THREAD_LIBS_INIT} ${LIBPMEM_LIBRARIES} ${TBB_LIBRARIES} hiredis)
 target_link_libraries(ycsb ${CMAKE_THREAD_LIBS_INIT} ${LIBPMEM_LIBRARIES} ${TBB_LIBRARIES})

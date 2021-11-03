@@ -5,7 +5,7 @@ services:
     build: .
 
     volumes:
-      - /home/ganquan/:/home/
+      - /home/gq:/home/
       - /home/ganquan/pmem:/mnt/pmem
     ports:
       - "34567:22"
