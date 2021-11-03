@@ -16,7 +16,6 @@
 #include "core/client.h"
 #include "core/core_workload.h"
 #include "db/db_factory.h"
-#include "db/roart_db.h"
 
 using namespace std;
 

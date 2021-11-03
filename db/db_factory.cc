@@ -14,7 +14,9 @@
 //#include "db/redis_db.h"
 #include "db/tbb_rand_db.h"
 #include "db/tbb_scan_db.h"
+#ifdef USING_ROART
 #include "db/roart_db.h"
+#endif
 
 #ifdef USING_PMEM_ROCKSDB
 #include "db/pmem_rocksdb_db.h"
