@@ -78,11 +78,11 @@ const string CoreWorkload::OPERATION_COUNT_PROPERTY = "operationcount";
 
 void CoreWorkload::Init(const utils::Properties &p) {
   table_name_ = p.GetProperty(TABLENAME_PROPERTY,TABLENAME_DEFAULT);
-  
+
   field_count_ = std::stoi(p.GetProperty(FIELD_COUNT_PROPERTY,
                                          FIELD_COUNT_DEFAULT));
   field_len_generator_ = GetFieldLenGenerator(p);
-  
+
   double read_proportion = std::stod(p.GetProperty(READ_PROPORTION_PROPERTY,
                                                    READ_PROPORTION_DEFAULT));
   double update_proportion = std::stod(p.GetProperty(UPDATE_PROPORTION_PROPERTY,
@@ -93,7 +93,7 @@ void CoreWorkload::Init(const utils::Properties &p) {
                                                    SCAN_PROPORTION_DEFAULT));
   double readmodifywrite_proportion = std::stod(p.GetProperty(
       READMODIFYWRITE_PROPORTION_PROPERTY, READMODIFYWRITE_PROPORTION_DEFAULT));
-  
+
   record_count_ = std::stoi(p.GetProperty(RECORD_COUNT_PROPERTY));
   std::string request_dist = p.GetProperty(REQUEST_DISTRIBUTION_PROPERTY,
                                            REQUEST_DISTRIBUTION_DEFAULT);
@@ -104,20 +104,21 @@ void CoreWorkload::Init(const utils::Properties &p) {
                                             SCAN_LENGTH_DISTRIBUTION_DEFAULT);
   int insert_start = std::stoi(p.GetProperty(INSERT_START_PROPERTY,
                                              INSERT_START_DEFAULT));
-  
+
   read_all_fields_ = utils::StrToBool(p.GetProperty(READ_ALL_FIELDS_PROPERTY,
                                                     READ_ALL_FIELDS_DEFAULT));
   write_all_fields_ = utils::StrToBool(p.GetProperty(WRITE_ALL_FIELDS_PROPERTY,
                                                      WRITE_ALL_FIELDS_DEFAULT));
-  
+
   if (p.GetProperty(INSERT_ORDER_PROPERTY, INSERT_ORDER_DEFAULT) == "hashed") {
     ordered_inserts_ = false;
   } else {
     ordered_inserts_ = true;
   }
-  
+  // 默认从0开始递增，但是在BuildKeyName当中会调用一次hash，所以其实是一样的？
   key_generator_ = new CounterGenerator(insert_start);
-  
+
+
   if (read_proportion > 0) {
     op_chooser_.AddValue(READ, read_proportion);
   }
@@ -133,12 +134,12 @@ void CoreWorkload::Init(const utils::Properties &p) {
   if (readmodifywrite_proportion > 0) {
     op_chooser_.AddValue(READMODIFYWRITE, readmodifywrite_proportion);
   }
-  
+
   insert_key_sequence_.Set(record_count_);
-  
+
   if (request_dist == "uniform") {
     key_chooser_ = new UniformGenerator(0, record_count_ - 1);
-    
+
   } else if (request_dist == "zipfian") {
     // If the number of keys changes, we don't want to change popular keys.
     // So we construct the scrambled zipfian generator with a keyspace
@@ -148,24 +149,31 @@ void CoreWorkload::Init(const utils::Properties &p) {
     int op_count = std::stoi(p.GetProperty(OPERATION_COUNT_PROPERTY));
     int new_keys = (int)(op_count * insert_proportion * 2); // a fudge factor
     key_chooser_ = new ScrambledZipfianGenerator(record_count_ + new_keys);
-    
+
   } else if (request_dist == "latest") {
     key_chooser_ = new SkewedLatestGenerator(insert_key_sequence_);
-    
+
   } else {
     throw utils::Exception("Unknown request distribution: " + request_dist);
   }
-  
+
   field_chooser_ = new UniformGenerator(0, field_count_ - 1);
-  
+
   if (scan_len_dist == "uniform") {
     scan_len_chooser_ = new UniformGenerator(1, max_scan_len);
   } else if (scan_len_dist == "zipfian") {
     scan_len_chooser_ = new ZipfianGenerator(1, max_scan_len);
   } else {
     throw utils::Exception("Distribution not allowed for scan length: " +
-        scan_len_dist);
+                           scan_len_dist);
   }
+
+  file_ratio = std::stoi(p.GetProperty("file_ratio", "12"));
+  prefix_num = record_count_ / file_ratio;
+  // 简单来讲就是，pinode是[0, prefix_num]，那么inode就简单的设置为 [0, record_count_ ) + prefix_num，使得pinode和inode完全分隔开
+  // 从prefix_num开始
+  inode_generator_ = new CounterGenerator(prefix_num);
+  //  inode_generator_ = new UniformGenerator(prefix_num, prefix_num + record_count_ );
 }
 
 ycsbc::Generator<uint64_t> *CoreWorkload::GetFieldLenGenerator(
@@ -182,23 +190,24 @@ ycsbc::Generator<uint64_t> *CoreWorkload::GetFieldLenGenerator(
     return new ZipfianGenerator(1, field_len);
   } else {
     throw utils::Exception("Unknown field length distribution: " +
-        field_len_dist);
+                           field_len_dist);
   }
 }
 
 void CoreWorkload::BuildValues(std::vector<ycsbc::DB::KVPair> &values) {
   for (int i = 0; i < field_count_; ++i) {
     ycsbc::DB::KVPair pair;
-    pair.first.append("field").append(std::to_string(i));
-    pair.second.append(field_len_generator_->Next(), utils::RandomPrintChar());
+    //    pair.first.append("field").append(std::to_string(i));
+    pair.first.append(std::to_string(inode_generator_->Next())); // inode
+    pair.second.append(field_len_generator_->Next(), utils::RandomPrintChar()); // stat
     values.push_back(pair);
   }
 }
 
+// TODO: update 还需要改
 void CoreWorkload::BuildUpdate(std::vector<ycsbc::DB::KVPair> &update) {
   ycsbc::DB::KVPair pair;
   pair.first.append(NextFieldName());
   pair.second.append(field_len_generator_->Next(), utils::RandomPrintChar());
   update.push_back(pair);
 }
-

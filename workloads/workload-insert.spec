@@ -1,10 +1,10 @@
 # insert only
-recordcount=160000000
-operationcount=32000000
+recordcount=160000
+operationcount=32000
 #recordcount=1600000
 #operationcount=320000
-fieldcount=8
-fieldlength=32
+fieldcount=1
+fieldlength=144
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true

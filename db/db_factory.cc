@@ -11,15 +11,32 @@
 #include <string>
 #include "db/basic_db.h"
 #include "db/lock_stl_db.h"
-//#include "db/redis_db.h"
+#include "db/redis_db.h"
 #include "db/tbb_rand_db.h"
 #include "db/tbb_scan_db.h"
-#ifdef USING_ROART
-#include "db/roart_db.h"
-#endif
-
+//#include "db/log_db.h.back"
 #ifdef USING_PMEM_ROCKSDB
 #include "db/pmem_rocksdb_db.h"
+#endif
+
+#ifdef USING_CCEH
+#include "db/cceh_db.h"
+#endif
+
+#ifdef USING_UTREE
+#include "db/utree_db.h"
+#endif
+
+#ifdef USING_VIPER
+#include "db/viper_db.h"
+#endif
+
+#ifdef USING_HIKV
+#include "db/hikvdb.h"
+#endif
+
+#ifdef USING_METAKV
+#include "db/metakv_db.h"
 #endif
 
 using namespace std;
@@ -31,25 +48,23 @@ DB* DBFactory::CreateDB(utils::Properties &props) {
     return new BasicDB;
   } else if (props["dbname"] == "lock_stl") {
     return new LockStlDB;
-  // } else if (props["dbname"] == "redis") {
-  //   int port = stoi(props["port"]);
-  //   int slaves = stoi(props["slaves"]);
-  //   return new RedisDB(props["host"].c_str(), port, slaves);
   } else if (props["dbname"] == "tbb_rand") {
     return new TbbRandDB;
   } else if (props["dbname"] == "tbb_scan") {
     return new TbbScanDB;
-  } 
-  #ifdef USING_PMEM_ROCKSDB
-  else if (props["dbname"] == "pmem-rocksdb"){
-      return new ycsb_pmem_rocksdb::PmemRocksDB;
+    //} else if (props["dbname"] == "logdb"){
+    //    return new LogDB;
+#ifdef USING_PMEM_ROCKSDB
+  } else if (props["dbname"] == "pmem-rocksdb"){
+    return new ycsb_pmem_rocksdb::PmemRocksDB;
+#endif
+
+
+
+#ifdef USING_METAKV
+  } else if (props["dbname"] == "metakv"){
+    return new ycsb_metakv::ycsbMetaKV;
+#endif
   }
-  #endif
-  #ifdef USING_ROART 
-  else if (props["dbname"] == "roart") {
-    return new ycsbc_roart::RoartDB;
-  }
-  #endif
   else return NULL;
 }
-

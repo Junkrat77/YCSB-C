@@ -7,3 +7,6 @@
 	path = lib/ROART
 	url = git@github.com:Junkrat77/ROART.git
 	branch = developing
+[submodule "lib/metakv"]
+	path = lib/metakv
+	url = git@github.com:Junkrat77/metakv.git
