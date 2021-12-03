@@ -35,7 +35,7 @@ namespace ycsb_metakv{
         SliceInit(&fname, tmp_fname.size() + 1, tmp_fname.data());
         uint64_t inode = std::stoull(values.at(0).first);
         std::string stat_str = values.at(0).second;
-        printf("[thread: %lu] INSERT: pinode: %lu, fname: %s, inode: %lu\n", std::this_thread::get_id(), pinode, tmp_fname.c_str(), inode);
+        // printf("[thread: %lu] INSERT: pinode: %lu, fname: %s, inode: %lu\n", std::this_thread::get_id(), pinode, tmp_fname.c_str(), inode);
         fflush(stdout);
         if (MetaKVPut(&db, pinode, &fname, inode, reinterpret_cast<struct stat *>(stat_str.data())) != 0) {
             return DB::kErrorNoData;
@@ -56,8 +56,8 @@ namespace ycsb_metakv{
         uint64_t inode = 0;
         struct Slice stat_slice;
 
-        printf("GET: pinode: %lu, fname: %s\n", pinode, tmp_fname.c_str());
-        fflush(stdout);
+//        printf("GET: pinode: %lu, fname: %s\n", pinode, tmp_fname.c_str());
+//        fflush(stdout);
 
         if (MetaKVGet(&db, pinode, &fname, &inode, &stat_slice) != 1) {
             return DB::kErrorNoData;

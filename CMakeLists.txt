@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.20)
 project(ycsb)
 
 set(CMAKE_CXX_STANDARD 17)
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 include(FindThreads)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TBB REQUIRED tbb)
@@ -16,7 +16,6 @@ pkg_check_modules(LIBPMEMOBJ REQUIRED libpmemobj)
 #as some function name may conflict
 option(WITH_PMEM_ROCKSDB "support the pmem rocksdb" OFF)
 option(WITH_METAKV "support for MetaKV" ON)
-
 add_executable(ycsb "" db/metakv_db.cc db/metakv_db.h)
 target_sources(ycsb PUBLIC
         "core/client.h"

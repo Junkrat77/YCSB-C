@@ -41,3 +41,5 @@
 redis/sample
 ycsbc
 build/*
+
+.idea/*

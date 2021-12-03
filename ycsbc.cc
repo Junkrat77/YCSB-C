@@ -73,9 +73,12 @@ int main(const int argc, const char *argv[]) {
   }
   assert((int)actual_ops.size() == num_threads);
   int sum = 0;
+  int over_num = 0;
   for (auto &n : actual_ops) {
     assert(n.valid());
     sum += n.get(); // 等价于先调用wait在调用get
+    over_num ++;
+    printf("已完成的线程: %d\n", over_num);
   }
   double duration1 = timer1.End();
   cout << "# Loading records:\t" << sum << " takes " << duration1 << " s"<< endl;
