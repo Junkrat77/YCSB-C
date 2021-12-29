@@ -1,12 +1,12 @@
 
 [submodule "lib/pmem-rocksdb"]
 	path = lib/pmem-rocksdb
-	url = https//github.com/Junkrat77/pmem-rocksdb.git
+	url = https://github.com/Junkrat77/pmem-rocksdb.git
 	branch = developing
 [submodule "lib/ROART"]
 	path = lib/ROART
-	url = https//github.com/Junkrat77/ROART.git
+	url = https://github.com/Junkrat77/ROART.git
 	branch = developing
 [submodule "lib/metakv"]
 	path = lib/metakv
-	url = https//github.com/Junkrat77/metakv.git
+	url = https://github.com/Junkrat77/metakv.git
