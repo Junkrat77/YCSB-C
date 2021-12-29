@@ -1,6 +1,6 @@
 # insert only
-recordcount=160000
-operationcount=32000
+recordcount=1600000
+operationcount=320000
 #recordcount=1600000
 #operationcount=320000
 fieldcount=1
